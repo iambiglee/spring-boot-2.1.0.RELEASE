@@ -273,18 +273,25 @@ public class SpringApplication {
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public SpringApplication(ResourceLoader resourceLoader, Class<?>... primarySources) {
+
 		// 【1】给resourceLoader属性赋值，注意传入的resourceLoader参数为null
 		this.resourceLoader = resourceLoader;
+
 		Assert.notNull(primarySources, "PrimarySources must not be null");
+
 		// 【2】给primarySources属性赋值，传入的primarySources其实就是SpringApplication.run(MainApplication.class, args);中的MainApplication.class
 		this.primarySources = new LinkedHashSet<>(Arrays.asList(primarySources));
+
 		// 【3】给webApplicationType属性赋值，根据classpath中存在哪种类型的类来确定是哪种应用类型
 		this.webApplicationType = WebApplicationType.deduceFromClasspath();
+
 		// 【4】给initializers属性赋值，利用SpringBoot自定义的SPI从spring.factories中加载ApplicationContextInitializer接口的实现类并赋值给initializers属性
 		setInitializers((Collection) getSpringFactoriesInstances(
 				ApplicationContextInitializer.class));
+
 		// 【5】给listeners属性赋值，利用SpringBoot自定义的SPI从spring.factories中加载ApplicationListener接口的实现类并赋值给listeners属性
 		setListeners((Collection) getSpringFactoriesInstances(ApplicationListener.class));
+
 		// 【6】给mainApplicationClass属性赋值，即这里要推断哪个类调用了main函数，然后再赋值给mainApplicationClass属性，用于后面启动流程中打印一些日志。
 		this.mainApplicationClass = deduceMainApplicationClass();
 	}
