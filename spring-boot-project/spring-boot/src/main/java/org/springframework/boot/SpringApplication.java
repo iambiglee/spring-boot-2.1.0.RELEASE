@@ -332,16 +332,20 @@ public class SpringApplication {
 		// 配置headless属性，即“java.awt.headless”属性，默认为ture
 		// 其实是想设置该应用程序,即使没有检测到显示器,也允许其启动.对于服务器来说,是不需要显示器的,所以要这样设置.
 		configureHeadlessProperty();
+
 		// 【1】从spring.factories配置文件中加载到EventPublishingRunListener对象并赋值给SpringApplicationRunListeners
 		// EventPublishingRunListener对象主要用来发射SpringBoot启动过程中内置的一些生命周期事件，标志每个不同启动阶段
 		SpringApplicationRunListeners listeners = getRunListeners(args);
+
 		// 启动SpringApplicationRunListener的监听，表示SpringApplication开始启动。
 		// 》》》》》发射【ApplicationStartingEvent】事件
 		listeners.starting();
 		try {
+
 			// 创建ApplicationArguments对象，封装了args参数
 			ApplicationArguments applicationArguments = new DefaultApplicationArguments(
 					args);
+
 			// 【2】准备环境变量，包括系统变量，环境变量，命令行参数，默认变量，servlet相关配置变量，随机值，
 			// JNDI属性值，以及配置文件（比如application.properties）等，注意这些环境变量是有优先级的
 			// 》》》》》发射【ApplicationEnvironmentPreparedEvent】事件
@@ -349,18 +353,23 @@ public class SpringApplication {
 			// TODO 自己想想加密的属性是如何扩展的？如何改造？
 			ConfigurableEnvironment environment = prepareEnvironment(listeners,
 					applicationArguments);
+
 			// 配置spring.beaninfo.ignore属性，默认为true，即跳过搜索BeanInfo classes.
 			configureIgnoreBeanInfo(environment);
+
 			// 【3】控制台打印SpringBoot的bannner标志
 			Banner printedBanner = printBanner(environment);
+
 			// 【4】根据不同类型创建不同类型的spring applicationcontext容器
 			// 因为这里是servlet环境，所以创建的是AnnotationConfigServletWebServerApplicationContext容器对象
 			context = createApplicationContext();
+
 			// 【5】从spring.factories配置文件中加载异常报告期实例，这里加载的是FailureAnalyzers
 			// 注意FailureAnalyzers的构造器要传入ConfigurableApplicationContext，因为要从context中获取beanFactory和environment
 			exceptionReporters = getSpringFactoriesInstances(
 					SpringBootExceptionReporter.class,
 					new Class[] { ConfigurableApplicationContext.class }, context); // ConfigurableApplicationContext是AnnotationConfigServletWebServerApplicationContext的父接口
+
 			// 【6】为刚创建的AnnotationConfigServletWebServerApplicationContext容器对象做一些初始化工作，准备一些容器属性值等
 			// 1）为AnnotationConfigServletWebServerApplicationContext的属性AnnotatedBeanDefinitionReader和ClassPathBeanDefinitionScanner设置environgment属性
 			// 2）根据情况对ApplicationContext应用一些相关的后置处理，比如设置resourceLoader属性等
@@ -471,7 +480,7 @@ public class SpringApplication {
 		}
 	}
 
-	private void prepareContext(ConfigurableApplicationContext context,
+	private void                                          prepareContext(ConfigurableApplicationContext context,
 			ConfigurableEnvironment environment, SpringApplicationRunListeners listeners,
 			ApplicationArguments applicationArguments, Banner printedBanner) {
 
@@ -497,6 +506,7 @@ public class SpringApplication {
 		Set<Object> sources = getAllSources();
 		Assert.notEmpty(sources, "Sources must not be empty");
 		// TODO 这里加载的是什么bean?这里加载bean后，spring容器刷新过程中还会继续加载bean吗？
+		//是写在启动类中的Bean加载进容器
 		load(context, sources.toArray(new Object[0]));
 		listeners.contextLoaded(context);
 	}
@@ -535,15 +545,19 @@ public class SpringApplication {
 			Class<?>[] parameterTypes, Object... args) {
 		// 【1】获得类加载器
 		ClassLoader classLoader = getClassLoader();
+
 		// Use names and ensure unique to protect against duplicates
 		// 【2】将接口类型和类加载器作为参数传入loadFactoryNames方法，从spring.factories配置文件中进行加载接口实现类
 		Set<String> names = new LinkedHashSet<>(
 				SpringFactoriesLoader.loadFactoryNames(type, classLoader));
+
 		// 【3】实例化从spring.factories中加载的接口实现类
 		List<T> instances = createSpringFactoriesInstances(type, parameterTypes,
 				classLoader, args, names);
+
 		// 【4】进行排序
 		AnnotationAwareOrderComparator.sort(instances);
+
 		// 【5】返回加载并实例化好的接口实现类
 		return instances;
 	}
@@ -852,6 +866,7 @@ public class SpringApplication {
 	}
 
 	/**
+	 * 获取类加载器
 	 * Either the ClassLoader that will be used in the ApplicationContext (if
 	 * {@link #setResourceLoader(ResourceLoader) resourceLoader} is set, or the context
 	 * class loader (if not null), or the loader of the Spring {@link ClassUtils} class.
